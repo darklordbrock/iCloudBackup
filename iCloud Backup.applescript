@@ -1,18 +1,26 @@
 # BackupPath is set to the Desktop as a "working" folder for me.
 # Meaning I just dump the backups and zip it up from there.
-# The final destionation for my backups is in my Dropbox folder.
+# The final destination for my backups is in my Dropbox or BitTorrent Sync folder.
+
+# If the backup happens on January 1, 2014, the final backup destination will
+# be in /Backups/iCloud/20140101/.
+
 set NonPOSIXBackupPath to (path to desktop as Unicode text)
 set NonPOSIXDropboxPath to (path to home folder as Unicode text) & "Dropbox:"
+set NonPOSIXBTSyncPath to (path to home folder as Unicode text) & "Sync:"
 set BackupPath to (POSIX path of NonPOSIXBackupPath)
 set DropboxPath to (POSIX path of NonPOSIXDropboxPath)
+set BTSyncPath to (POSIX path of NonPOSIXBTSyncPath)
 
 # I like my backups organized, so I append to the above line the following:
 # Backups/iCloud/" + I append the current YYYYMMDD using "date +%Y%m%d"
-#set dateVar to do shell script "date +%Y%m%d"
-#set DropboxPath to DropboxPath & "Backups/iCloud/" & dateVar & "/"
+set dateVar to do shell script "date +%Y%m%d"
+set DropboxPath to DropboxPath & "Backups/iCloud/" & dateVar & "/"
+set BTSyncPath to BTSyncPath & "Backups/iCloud/" & dateVar & "/"
 
 property ZipFiles : true
-property UseDropbox : true
+property UseDropbox : false
+property UseBTSync : true
 
 # Name of the exported backup files.
 set SafariBackup to "Safari Bookmarks"
@@ -46,7 +54,7 @@ tell application "Safari"
 	activate
 end tell
 tell application "System Events" to tell process "Safari"
-	click menu item "Export Bookmarks…" of menu "File" of menu bar item "File" of menu bar 1
+	click menu item "Export Bookmarks‚Ä¶" of menu "File" of menu bar item "File" of menu bar 1
 	delay SecondsDelay
 	keystroke SafariBackup
 	delay SecondsDelay
@@ -65,7 +73,7 @@ tell application "Contacts"
 	activate
 end tell
 tell application "System Events" to tell process "Contacts"
-	click menu item "Contacts Archive…" of menu "Export…" of menu item "Export…" of menu "File" of menu bar item "File" of menu bar 1
+	click menu item "Contacts Archive‚Ä¶" of menu "Export‚Ä¶" of menu item "Export‚Ä¶" of menu "File" of menu bar item "File" of menu bar 1
 	delay SecondsDelay
 	keystroke ContactsBackup
 	delay SecondsDelay
@@ -84,7 +92,7 @@ tell application "Calendar"
 	activate
 end tell
 tell application "System Events" to tell process "Calendar"
-	click menu item "Calendar Archive…" of menu "Export" of menu item "Export" of menu "File" of menu bar item "File" of menu bar 1
+	click menu item "Calendar Archive‚Ä¶" of menu "Export" of menu item "Export" of menu "File" of menu bar item "File" of menu bar 1
 	delay SecondsDelay
 	keystroke CalendarBackup
 	delay SecondsDelay
@@ -107,10 +115,22 @@ end if
 
 if UseDropbox is true then
 	if ZipFiles is true then
-		#		do shell script "mkdir " & DropboxPath
+		do shell script "mkdir " & DropboxPath
 		do shell script "mv \"" & BackupPath & SafariBackupFilenameZipped & "\" \"" & DropboxPath & "\""
 		do shell script "mv \"" & BackupPath & ContactsBackupFilenameZipped & "\" \"" & DropboxPath & "\""
 		do shell script "mv \"" & BackupPath & CalendarBackupFilenameZipped & "\" \"" & DropboxPath & "\""
+	end if
+	
+end if
+
+# BITTORRENT SYNC BACKUP SECTION
+
+if UseBTSync is true then
+	if ZipFiles is true then
+		do shell script "mkdir " & BTSyncPath
+		do shell script "mv \"" & BackupPath & SafariBackupFilenameZipped & "\" \"" & BTSyncPath & "\""
+		do shell script "mv \"" & BackupPath & ContactsBackupFilenameZipped & "\" \"" & BTSyncPath & "\""
+		do shell script "mv \"" & BackupPath & CalendarBackupFilenameZipped & "\" \"" & BTSyncPath & "\""
 	end if
 	
 end if
